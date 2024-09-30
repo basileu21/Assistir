@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transmissão de Tela - Espectador</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 10px;
+    }
+    video {
+      width: 80%;
+      margin-top: 20px;
+      border: 2px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>Assistir Transmissão</h1>
+  <input type="text" id="peerIdInput" placeholder="Insira o ID do transmissor" />
+  <button id="connectButton">Conectar</button>
+  <video id="liveStream" controls autoplay></video>
+
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.3.1/dist/peerjs.min.js"></script>
+  <script>
+    const connectButton = document.getElementById('connectButton');
+    const peerIdInput = document.getElementById('peerIdInput');
+    const videoElement = document.getElementById('liveStream');
+
+    let peer = new Peer(); // Cria um peer para o espectador
+
+    connectButton.addEventListener('click', () => {
+      const peerId = peerIdInput.value;
+
+      // Tenta se conectar ao transmissor usando o ID
+      const conn = peer.connect(peerId);
+
+      conn.on('open', () => {
+        console.log(`Conectado ao transmissor: ${peerId}`);
+
+        // Recebe o fluxo de vídeo da tela do transmissor
+        const call = peer.call(peerId);
+        call.on('stream', (remoteStream) => {
+          videoElement.srcObject = remoteStream; // Exibe o stream ao vivo
+        });
+      });
+    });
+  </script>
+</body>
+</html>
